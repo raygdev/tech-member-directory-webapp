@@ -29,7 +29,7 @@ app.use(passport.session());
 
 
 // mongoose.connect('mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.0');
-mongoose.connect('mongodb://mongo:Fg6Be6eEg5fH3532AE6hB5GE3FF5dDg-@mongodb.railway.internal:27017', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://mongo:sTbjQGTfrDCwuqASiglQwbHewwppdeZv@mongodb.railway.internal:27017', { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 const userSchema = new mongoose.Schema({
