@@ -28,7 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-mongoose.connect(process.env.MongoDBString);
+mongoose.connect('mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.0');
 
 
 const userSchema = new mongoose.Schema({
