@@ -7,7 +7,7 @@ const { log } = require("console");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-// const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 
@@ -18,14 +18,14 @@ app.use(bodyParser.urlencoded({
 }));
 
 // Initialize MongoDB Session Store
-// const sessionStore = new MongoDBStore({
-//   uri: process.env.MongoDBString,
-//   collection: 'mySessions',
-// });
+const sessionStore = new MongoDBStore({
+  uri: process.env.MongoDBString,
+  collection: 'mySessions',
+});
 
-// sessionStore.on('error', (error) => {
-//   console.error('Session store error:', error);
-// });
+sessionStore.on('error', (error) => {
+  console.error('Session store error:', error);
+});
 
 // Configure Session Middleware
 app.use(
