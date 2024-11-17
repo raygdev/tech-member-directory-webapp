@@ -7,7 +7,7 @@ const { log } = require("console");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 
@@ -17,12 +17,30 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+// Initialize MongoDB Session Store
+const store = new MongoDBStore({
+  uri: process.env.MongoDBString,
+  collection: 'mySessions',
+});
 
-app.use(session({
-    secret: 'thisIsTheAuthenticateString',
+store.on('error', (error) => {
+  console.error('Session store error:', error);
+});
+
+// Configure Session
+app.use(
+  session({
+    secret: process.env.AuthenticateString,
     resave: false,
-    saveUninitialized: true
-  }));
+    saveUninitialized: false,
+    store,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
