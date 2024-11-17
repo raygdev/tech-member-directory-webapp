@@ -27,10 +27,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+// MongoDB Connection
 // mongoose.connect('mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.0');
-mongoose.connect('mongodb://mongo:sTbjQGTfrDCwuqASiglQwbHewwppdeZv@mongodb.railway.internal:27017', { useNewUrlParser: true, useUnifiedTopology: true })
-
+mongoose
+  .connect(process.env.MongoDBString)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 const userSchema = new mongoose.Schema({
     email: String,
