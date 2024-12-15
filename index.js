@@ -139,7 +139,11 @@ app.get("/logout", function (req, res) {
 });
 
 
-app.get("/edit/:id", function (req, res) {
+app.get("/edit/:id", ensureAuthenticated, function (req, res) {
+  // Check if the authenticated user is authorized to update this record
+  if (req.user._id.toString() !== req.params.id) {
+    return res.status(403).send("Forbidden: You are not allowed to update this project.");
+  }
   User.findById(req.params.id)
     .then(foundUser => {
       if (foundUser) {
