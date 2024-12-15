@@ -159,14 +159,19 @@ app.get("/edit/:id", ensureAuthenticated, function (req, res) {
 });
 
 
-app.get("/delete/:id", function (req, res) {
+app.get("/delete/:id", ensureAuthenticated, function (req, res) {
   const userId = req.params.id;
-
-  // Validate user ID (optional)
+  
+  // Validate user ID
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).send("Invalid user ID format");
   }
 
+  // Check if the authenticated user is authorized to update this record
+  if (req.user._id.toString() !== userId) {
+    return res.status(403).send("Forbidden: You are not allowed to delete this project.");
+  }
+  
   User.findByIdAndDelete(userId)
     .then(deletedUser => {
       if (!deletedUser) {
