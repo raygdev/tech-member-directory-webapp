@@ -16,6 +16,7 @@ activate App
 App --> Browser : Redirect to /register
 deactivate App
 
+
 == POST /register ==
 Browser -> App : POST /register\n- username\n- password
 activate App
@@ -39,6 +40,7 @@ else
   App --> Browser: redirect to /register\n error message
   deactivate App
 end
+
 
 == POST /login ==
 Browser -> App: POST /login\n- username\n- password
@@ -64,7 +66,6 @@ alt user exists
     App -> App: log the error
     App --> Browser: redirect to /login\n- session data
   end
-'      
 else no user is found
   Passport --> App: user not found
   App --> Browser: redirect to /login
@@ -77,12 +78,10 @@ else error
 end
 
 
-
-
 == POST /submit == 
-
 Browser -> App: POST /submit\n- email\n- project\n- percent_done\n- description
 activate App
+'MIDDLEWARE
 App -> Passport: ensureAuthenticated
 activate Passport
 Passport -> Passport: get user data from req
@@ -93,8 +92,6 @@ MySession --> Passport: response
 deactivate MySession
 Passport --> App: response
 deactivate Passport
-
-
 alt user is not authenticated
   App --> Browser: redirect to /login
 else user is authenticated
@@ -102,7 +99,6 @@ else user is authenticated
   activate Users
   Users --> App: response
   deactivate Users
-
   alt found user
     App -> Users: submit project:\n- email\n- project\n- percent_done\n- description
     activate Users
@@ -117,9 +113,48 @@ else user is authenticated
     App --> Browser: error message
     deactivate App
   end
-  
 end
 
-deactivate Browser
+== POST /update/:id ==
+Browser -> App: POST /update/:id\n- project\n- percent_done\n- description
+activate App
+'MIDDLEWARE
+App -> Passport: ensureAuthenticated
+activate Passport
+Passport -> Passport: get user data from req
+note over Passport: checking for an active session
+Passport -> MySession: req.isAuthenticated()\n- user
+activate MySession
+MySession --> Passport: response
+deactivate MySession
+Passport --> App: response
+deactivate Passport
+alt user is not authenticated
+  App --> Browser: redirect to /login
+else user is authenticated
+  App -> App: Does the user own the project?
+  alt The user is NOT the owner
+  App -> Browser: 403 - Forbidden
+else The user is the owner
+    App -> Users: Update project document\n- id\n- project\n- percent_done\n- description
+    activate Users
+    Users -> App: respone
+    deactivate Users
+    alt response is an updated document
+      App --> Browser: redirect to /project_tables\n- user/project data
+    else user/project not found
+      App --> Browser: User/Project not found
+    end
+    '    .catch(err => {
+  else error
+    App -> App: log the error
+    App --> Browser: error message
+    deactivate App
+  end
+end
 
+
+
+
+deactivate Browser
 @enduml
