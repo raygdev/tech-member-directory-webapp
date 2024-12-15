@@ -22,6 +22,7 @@ services:
     env_file:
       - ./env/.env.development.local
     platform: linux/amd64
+    command: ["npm", "run", "nodemon"]
 
   mongo:
     image: mongo:latest
