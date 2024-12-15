@@ -3,24 +3,8 @@ services:
     build: .
     ports:
       - "3000:3000"
-    depends_on:
-      - mongo
-    networks:
-      - app-network
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    container_name: mongo
-    env_file:
-      - .env.mongo
     volumes:
-      - data:/data/db
-    networks:
-      - app-network
-    restart: always
-networks:
-  app-network:
-    driver: bridge
-volumes:
-  data:
+      - ./:/app
+    platform: linux/amd64
+    env_file:
+      - ./env/.env
