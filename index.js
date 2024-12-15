@@ -179,7 +179,7 @@ app.post("/register", function (req, res) {
       res.redirect("/register");
     } else {
       passport.authenticate("local")(req, res, function () {
-        res.redirect("/login");
+        res.redirect("/project_cards");
       });
     }
   });
