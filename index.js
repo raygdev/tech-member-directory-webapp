@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose); // Adds username/password hashing and authentication
 
 const User = new mongoose.model("User", userSchema);
 
@@ -129,6 +129,7 @@ app.get("/logout", function (req, res) {
   });
 });
 
+
 app.get("/edit/:id", function (req, res) {
   User.findById(req.params.id)
     .then(foundUser => {
@@ -182,6 +183,7 @@ app.post("/register", function (req, res) {
 
 });
 
+
 app.post("/login", function (req, res) {
   passport.authenticate("local", function (err, user, info) {
     if (err) {
@@ -200,7 +202,6 @@ app.post("/login", function (req, res) {
     });
   })(req, res);
 });
-
 
 
 app.post('/logout', (req, res) => {
@@ -229,6 +230,7 @@ app.post("/submit", function (req, res) {
       console.log(err);
     });
 });
+
 
 app.post("/update/:id", function (req, res) {
   User.findByIdAndUpdate(req.params.id, req.body, { new: true })
