@@ -69,9 +69,11 @@ app.get("/", function (req, res) {
   res.render("register");
 });
 
+
 app.get("/login", function (req, res) {
   res.render("login");
 });
+
 
 app.get("/register", function (req, res) {
   res.render("register");
@@ -113,7 +115,6 @@ app.get(["/project_tables", "/project_cards"], function (req, res) {
 });
 
 
-
 app.get("/logout", function (req, res) {
 
   req.session.destroy((err) => {
@@ -144,10 +145,6 @@ app.get("/edit/:id", function (req, res) {
 });
 
 
-
-
-
-
 app.get("/delete/:id", function (req, res) {
   const userId = req.params.id;
 
@@ -170,7 +167,6 @@ app.get("/delete/:id", function (req, res) {
 });
 
 
-
 app.post("/register", function (req, res) {
 
   User.register({ username: req.body.username }, req.body.password, function (err, user) {
@@ -187,31 +183,30 @@ app.post("/register", function (req, res) {
 });
 
 app.post("/login", function (req, res) {
-
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password
-  });
-
-  req.login(user, function (err) {
+  passport.authenticate("local", function (err, user, info) {
     if (err) {
       console.log(err);
-    } else {
-      passport.authenticate("local")(req, res, function () {
-        res.redirect("/project_tables");
-      });
-
+      return res.redirect("/login"); // Redirect back to login if there's an error
     }
-  });
-
+    if (!user) {
+      return res.redirect("/login"); // Redirect if no user is found
+    }
+    req.login(user, function (err) {
+      if (err) {
+        console.log(err);
+        return res.redirect("/login"); // Redirect if login fails
+      }
+      return res.redirect("/project_tables"); // Successful login
+    });
+  })(req, res);
 });
+
 
 
 app.post('/logout', (req, res) => {
   req.session.destroy();
   res.render('logout_confirmed');
 });
-
 
 
 app.post("/submit", function (req, res) {
