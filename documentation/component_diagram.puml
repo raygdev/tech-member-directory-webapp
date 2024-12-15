@@ -1,0 +1,52 @@
+@startuml
+title Project Environments - 2024-12-14
+skinparam componentStyle rectangle
+
+node "Local Setup" {
+  component "Express.js Web App" as ExpressLocal1
+  database "MongoDB" as MongoLocal
+  ExpressLocal1 --> MongoLocal : "Connects to"
+}
+
+node "Local Setup 2" #pink {
+  component "Docker Compose" as compose1 {
+    node "App  Container" as appContainer1 {
+      component "Express.js Web App" as ExpressDockerLocal
+    }
+    node "Mongo Container" {
+      database "MongoDB" as MongoDockerLocal
+    }
+  }
+  ExpressDockerLocal --> MongoDockerLocal : "Connects to"
+}
+
+node "Mixed Setup 1" {
+  component "Express.js Web App" as ExpressLocal2
+}
+node "DigitalOcean" as mongoServer1 #lightblue {
+  database "MongoDB" as MongoManagedRemote1
+}
+ExpressLocal2 --> MongoManagedRemote1 : "Connects to"
+
+node "Mixed Setup 2" #lightgrey {
+  component "Docker Compose" as compose2 {
+    node "App Container" {
+      component "Express.js Web App" as ExpressDockerRemote
+    }
+  }
+}
+node "DigitalOcean" as mongoServer2 #lightblue {
+  database "MongoDB" as MongoManagedRemote2
+}
+ExpressDockerRemote --> MongoManagedRemote2 : "Connects to"
+
+
+node "DigitalOcean" as remoteServer3 #lightblue {
+  component "Express.js Web App" as ExpressRemote
+}
+node "DigitalOcean" as mongoServer3 #lightblue {
+  database "MongoDB" as MongoManagedServer3
+}
+ExpressRemote --> MongoManagedServer3 : "Connects to" 
+
+@enduml
