@@ -1,0 +1,125 @@
+@startuml
+title Casual Coding Member Directory - 2024-12-15
+
+participant Browser
+participant App
+participant Passport #lightgreen
+participant "Mongo\nmySession" as MySession #lightblue
+participant "Mongo\nusers" as Users #lightblue
+participant "Mongo\nprojects" as Projects #lightblue
+
+activate Browser
+
+== GET / ==
+Browser -> App : GET /
+activate App
+App --> Browser : Redirect to /register
+deactivate App
+
+== POST /register ==
+Browser -> App : POST /register\n- username\n- password
+activate App
+App -> Passport: register user
+activate Passport
+alt error
+  Passport -> Users: create user record\n- username\n- hashed password\n- salt
+  activate Users
+  Users --> Passport: response
+  note over Passport: TODO An error can occur here
+  deactivate Users
+  Passport -> MySession: log new user in\n(i.e., create session)
+  activate MySession
+  MySession --> Passport
+  deactivate MySession
+  Passport --> App: user record
+  deactivate Passport
+  App --> Browser: redirect to /project_cards
+else
+  App -> App: Redirect to /register
+  App --> Browser: redirect to /register\n error message
+  deactivate App
+end
+
+== POST /login ==
+Browser -> App: POST /login\n- username\n- password
+activate App
+App -> Passport: authenticate user
+activate Passport
+Passport -> Passport: from req.body, get:\n- username and\n- password
+'  passport.authenticate("local", function (err, user, info) {
+Passport -> Users: get user info
+activate Users
+Users --> Passport: response
+deactivate Users
+alt user exists
+  alt Successful login
+    Passport -> MySession: log in the user\n(i.e., create session)
+    activate MySession
+    MySession --> Passport
+    deactivate MySession
+    Passport --> App: session data
+    App --> Browser: redirect to /project_tables
+  else login failure
+    Passport --> App: error
+    App -> App: log the error
+    App --> Browser: redirect to /login\n- session data
+  end
+'      
+else no user is found
+  Passport --> App: user not found
+  App --> Browser: redirect to /login
+else error
+  Passport --> App: error
+  deactivate Passport
+  App -> App: log the error
+  App --> Browser: redirect to /login
+  deactivate App
+end
+
+
+
+
+== POST /submit == 
+
+Browser -> App: POST /submit\n- email\n- project\n- percent_done\n- description
+activate App
+App -> Passport: ensureAuthenticated
+activate Passport
+Passport -> Passport: get user data from req
+note over Passport: checking for an active session
+Passport -> MySession: req.isAuthenticated()\n- user
+activate MySession
+MySession --> Passport: response
+deactivate MySession
+Passport --> App: response
+deactivate Passport
+
+
+alt user is not authenticated
+  App --> Browser: redirect to /login
+else user is authenticated
+  App -> Users: find user by ID
+  activate Users
+  Users --> App: response
+  deactivate Users
+
+  alt found user
+    App -> Users: submit project:\n- email\n- project\n- percent_done\n- description
+    activate Users
+    Users --> App: OK
+    deactivate Users
+    App --> Browser: redirect to /project_tables
+  else user not found
+    note over App: TODO Handle this scenario
+    App --> Browser: redirect to /project_tables
+  else error
+    App -> App: log the error
+    App --> Browser: error message
+    deactivate App
+  end
+  
+end
+
+deactivate Browser
+
+@enduml
