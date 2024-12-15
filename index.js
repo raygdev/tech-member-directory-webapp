@@ -65,6 +65,15 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// User Authentication middleware
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+}
+
+
 app.get("/", function (req, res) {
   res.render("register");
 });
@@ -210,9 +219,8 @@ app.post('/logout', (req, res) => {
 });
 
 
-app.post("/submit", function (req, res) {
-  console.log(req.user);
-  User.findById(req.user)
+app.post("/submit", ensureAuthenticated, function (req, res) {
+  User.findById(req.user._id)
     .then(foundUser => {
       if (foundUser) {
         foundUser.project = req.body.project;
@@ -228,6 +236,7 @@ app.post("/submit", function (req, res) {
     })
     .catch(err => {
       console.log(err);
+      res.status(500).send("An error occurred while sumitting your project.");
     });
 });
 
