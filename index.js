@@ -241,20 +241,30 @@ app.post("/submit", ensureAuthenticated, function (req, res) {
 });
 
 
-app.post("/update/:id", function (req, res) {
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+app.post("/update/:id", ensureAuthenticated, function (req, res) {
+  // Check if the authenticated user is authorized to update this record
+  if (req.user._id.toString() !== req.params.id) {
+    return res.status(403).send("Forbidden: You are not allowed to update this project.");
+  }
+
+  // Validate and sanitize input fields
+  const { project, percent_done, description } = req.body;
+
+  // Update the user with only allowable fields
+  User.findByIdAndUpdate(req.params.id, { project, percent_done, description }, { new: true })
     .then(updatedUser => {
       if (updatedUser) {
         res.redirect("/project_tables");
       } else {
-        res.status(404).send("User not found");
+        res.status(404).send("User/Project not found");
       }
     })
     .catch(err => {
-      console.log(err);
-      res.status(500).send("Internal Server Error");
+      console.error("Error updating user:", err);
+      res.status(500).send("An unexpected error occurred.");
     });
 });
+
 
 
 // Code needed for Railway deploy  
