@@ -159,29 +159,53 @@ app.get("/edit/:id", ensureAuthenticated, function (req, res) {
 });
 
 
-app.get("/delete/:id", ensureAuthenticated, function (req, res) {
+// NOTE This route deletes a user, not just a project!!!
+// TODO Clarify what this route is supposed to do.
+// TODO Use separate routes for deleting projects and user records.
+app.delete("/delete/:id", ensureAuthenticated, function (req, res) {
   const userId = req.params.id;
-  
-  // Validate user ID
+
+  // Validate the ID
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).send("Invalid user ID format");
+    return res.status(400).send("Invalid user ID format.");
   }
 
-  // Check if the authenticated user is authorized to update this record
-  if (req.user._id.toString() !== userId) {
-    return res.status(403).send("Forbidden: You are not allowed to delete this project.");
+  // Check authorization
+  if (req.user._id.toString() !== userId && req.user.role !== "admin") {
+    return res.status(403).send("Forbidden: You are not allowed to delete this user.");
   }
-  
+
+  // Perform the delete operation
   User.findByIdAndDelete(userId)
     .then(deletedUser => {
       if (!deletedUser) {
-        return res.status(404).send("User not found");
+        return res.status(404).send("User not found.");
       }
-      res.send("Project deleted successfully");
+
+      // If the currently logged-in user is deleting their own account, log them out
+      if (req.user._id.toString() === userId) {
+        req.logout(err => {
+          if (err) {
+            console.error("Error logging out:", err);
+            return res.status(500).send("Error logging out after account deletion.");
+          }
+          req.session.destroy(err => {
+            if (err) {
+              console.error("Error destroying session:", err);
+              return res.status(500).send("Error destroying session after account deletion.");
+            }
+            res.clearCookie("connect.sid"); // Clear the session cookie
+            return res.send("Account deleted successfully and session terminated.");
+          });
+        });
+      } else {
+        // Admin deleting another user's account
+        res.json({ message: "User deleted successfully." });
+      }
     })
     .catch(err => {
-      console.error(err);
-      res.status(500).send("Internal Server Error");
+      console.error("Error deleting user:", err);
+      res.status(500).send("Internal Server Error.");
     });
 });
 
