@@ -134,8 +134,8 @@ alt user is not authenticated
 else user is authenticated
   App -> App: Does the user own the project?
   alt The user is NOT the owner
-  App -> Browser: 403 - Forbidden
-else The user is the owner
+    App -> Browser: 403 - Forbidden
+  else The user is the owner
     App -> Users: Update project document\n- id\n- project\n- percent_done\n- description
     activate Users
     Users -> App: respone
@@ -145,7 +145,6 @@ else The user is the owner
     else user/project not found
       App --> Browser: User/Project not found
     end
-    '    .catch(err => {
   else error
     App -> App: log the error
     App --> Browser: error message
@@ -154,7 +153,81 @@ else The user is the owner
 end
 
 
-
+== DELETE /:id ==
+Browser -> App: DELETE /:id
+activate App
+'MIDDLEWARE
+App -> Passport: ensureAuthenticated
+activate Passport
+Passport -> Passport: get user data from req
+note over Passport: checking for an active session
+Passport -> MySession: req.isAuthenticated()\n- user
+activate MySession
+MySession --> Passport: response
+deactivate MySession
+Passport --> App: response
+deactivate Passport
+alt user is not authenticated
+  App --> Browser: redirect to /login
+else user is authenticated
+'  const userId = req.params.id;
+  App -> App: validdate user ID format
+  alt Invalid format
+    App --> Browser: 400 - error message
+  else
+    ' Check authorization
+    App-> App: Does the user own the account and is the user NOT an admin? 
+    alt The user is not the owner and is not an admin
+      App --> Browser: 403 - error message\n- Not allowed
+    else
+      ' Perform the delete operation
+      '  User.findByIdAndDelete(userId)
+      App -> Users: delete document\n- id
+      activate Users
+      Users --> App: response
+      deactivate Users
+      '    .then(deletedUser => {
+      alt user not found
+        App -> Browser: 404 - error: user not found
+      else
+        App -> App: Who is the user?
+        alt user is the account owner
+          ' The currently logged-in user is deleting their own account, log them out
+          App -> Passport: Log the user out.\nreq.logout()
+          activate Passport
+          Passport -> MySession: delete the session
+          activate MySession
+          MySession -> Passport: response
+          deactivate MySession
+          Passport -> App: response
+          deactivate Passport
+          alt logout error
+            App -> App: Log the logout error
+            App -> Browser: 500 - error: Error logging out after account deletion
+          else user is logged out
+            App -> Passport: destroy the session\n req.session.destroy()
+            activate Passport
+            Passport -> App: respone
+            deactivate Passport
+            alt error deleting the session
+              App -> App: Log the error - Error destroying session.
+              App-> Browser: 500 - error - Error destroying session after account deletion.
+            else the session was successfully deleted
+              App -> App: Clear the session cookie
+              App-> Browser: "Account deleted successfully and session terminated."
+            end
+          end
+        else user is an admin
+          App --> Browser: user deleted successfully
+        end
+      else error
+        App -> App: log error deleting user
+        App --> Browser: error message - Internal Server Error
+        deactivate App
+      end
+    end
+  end
+end
 
 deactivate Browser
 @enduml
