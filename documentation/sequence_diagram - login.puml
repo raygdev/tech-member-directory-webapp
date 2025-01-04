@@ -179,7 +179,7 @@ else user is authenticated
     App-> App: Does the user own the account and is the user NOT an admin? 
     alt The user is not the owner and is not an admin
       App --> Browser: 403 - error message\n- Not allowed
-    else The user is the owner or an admin
+    else
       ' Perform the delete operation
       '  User.findByIdAndDelete(userId)
       App -> Users: delete document\n- id

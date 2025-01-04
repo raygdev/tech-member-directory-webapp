@@ -1,0 +1,19 @@
+@startuml
+title Casual Coding Member Directory - 2024-12-15
+
+participant Browser
+participant App
+participant Passport #lightgreen
+participant "Mongo\nmySession" as MySession #lightblue
+participant "Mongo\nusers" as Users #lightblue
+participant "Mongo\nprojects" as Projects #lightblue
+
+activate Browser
+
+== GET / ==
+Browser -> App : GET /
+activate App
+App --> Browser : Redirect to /register
+deactivate App
+deactivate Browser
+@enduml
