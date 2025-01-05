@@ -6,8 +6,9 @@ const mongoose = require("mongoose");
 const { log } = require("console");
 const session = require("express-session");
 const passport = require("passport");
-const passportLocalMongoose = require("passport-local-mongoose");
 const MongoDBStore = require('connect-mongodb-session')(session);
+const { Project, User } = require('./models');
+
 
 const app = express();
 
@@ -47,21 +48,7 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-const userSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-  project: String,
-  percent_done: String,
-  description: String,
-  passwordResetToken: String
-});
-
-userSchema.plugin(passportLocalMongoose); // Adds username/password hashing and authentication
-
-const User = new mongoose.model("User", userSchema);
-
 passport.use(User.createStrategy());
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -98,20 +85,41 @@ app.get("/submit", function (req, res) {
 });
 
 
-app.get(["/project_tables", "/project_cards"], function (req, res) {
+// app.get(["/project_tables", "/project_cards"], function (req, res) {
 
+//   if (req.isAuthenticated()) {
+//     User.find({ "project": { $ne: null } })
+//       .then(function (foundUsers) {
+//         if (req.url === "/project_tables") {
+//           // Render users in table format
+//           res.render("project_tables", { usersWithProjects: foundUsers });
+//         } else if (req.url === "/project_cards") {
+//           // Render users in card format
+//           res.render("project_cards", { usersWithProjects: foundUsers });
+//         } else {
+//           // Handle unexpected URL (optional)
+//           res.status(404).send("Not Found");
+//         }
+//       })
+//       .catch(function (err) {
+//         console.error(err);
+//         res.status(500).send("Internal Server Error");
+//       });
+//   } else {
+//     res.redirect("/login");
+//   }
+// });
+// Updated to use Project model instead of User model
+app.get(["/project_tables", "/project_cards"], function (req, res) {
   if (req.isAuthenticated()) {
-    User.find({ "project": { $ne: null } })
-      .then(function (foundUsers) {
+    Project.find()
+      .populate('owner', 'username email')
+      .populate('contributors', 'username email')
+      .then(function (projects) {
         if (req.url === "/project_tables") {
-          // Render users in table format
-          res.render("project_tables", { usersWithProjects: foundUsers });
+          res.render("project_tables", { projects });
         } else if (req.url === "/project_cards") {
-          // Render users in card format
-          res.render("project_cards", { usersWithProjects: foundUsers });
-        } else {
-          // Handle unexpected URL (optional)
-          res.status(404).send("Not Found");
+          res.render("project_cards", { projects });
         }
       })
       .catch(function (err) {
@@ -139,18 +147,40 @@ app.get("/logout", function (req, res) {
 });
 
 
-app.get("/edit/:id", ensureAuthenticated, function (req, res) {
-  // Check if the authenticated user is authorized to update this record
-  if (req.user._id.toString() !== req.params.id) {
-    return res.status(403).send("Forbidden: You are not allowed to update this project.");
-  }
-  User.findById(req.params.id)
-    .then(foundUser => {
-      if (foundUser) {
-        res.render("edit", { user: foundUser });
-      } else {
-        res.status(404).send("User not found");
+// app.get("/edit/:id", ensureAuthenticated, function (req, res) {
+//   // Check if the authenticated user is authorized qto update this record
+//   if (req.user._id.toString() !== req.params.id) {
+//     return res.status(403).send("Forbidden: You are not allowed to update this project.");
+//   }
+//   User.findById(req.params.id)
+//     .then(foundUser => {
+//       if (foundUser) {
+//         res.render("edit", { user: foundUser });
+//       } else {
+//         res.status(404).send("User not found");
+//       }
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).send("Internal Server Error");
+//     });
+// });
+// Updated edit route to handle projects
+// Edit a project
+app.put("/projects/:id", ensureAuthenticated, function (req, res) {
+  Project.findById(req.params.id)
+    .populate('owner')
+    .populate('contributors')
+    .then(project => {
+      if (!project) {
+        return res.status(404).send("Project not found");
       }
+      // Check if user is owner or contributor
+      if (project.owner._id.toString() !== req.user._id.toString() && 
+          !project.contributors.some(c => c._id.toString() === req.user._id.toString())) {
+        return res.status(403).send("Forbidden: You are not authorized to edit this project.");
+      }
+      res.render("edit", { project });
     })
     .catch(err => {
       console.log(err);
@@ -162,56 +192,87 @@ app.get("/edit/:id", ensureAuthenticated, function (req, res) {
 // NOTE This route deletes a user, not just a project!!!
 // TODO Clarify what this route is supposed to do.
 // TODO Use separate routes for deleting projects and user records.
-app.delete("/delete/:id", ensureAuthenticated, function (req, res) {
-  const userId = req.params.id;
+// app.delete("/delete/:id", ensureAuthenticated, function (req, res) {
+//   const userIdToDelete = req.params.id;
+  
+//   const loggedInUserId = req.user._id.toString();
+//   const loggedInUserRole = req.user.role;
 
-  // Validate the ID
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).send("Invalid user ID format.");
+//   // Validate input before performing MongoDB operations
+//   if (!mongoose.Types.ObjectId.isValid(userIdToDelete)) {
+//     return res.status(400).send("Invalid user ID format.");
+//   }
+
+//   // Check authorization
+//   if (loggedInUserId !== userIdToDelete && loggedInUserRole !== "admin") {
+//     return res.status(403).send("Forbidden: You are not allowed to delete this user.");
+//   }
+
+//   // Perform the delete operations
+//   User.findByIdAndDelete(userIdToDelete)
+//     .then(deletedUser => {
+//       if (!deletedUser) {
+//         return res.status(404).send("User not found.");
+//       }
+
+//       // If the currently logged-in user is deleting their own account, log them out.
+//       if (loggedInUserId === userIdToDelete) {
+//         req.logout(err => {
+//           if (err) {
+//             console.error("Error logging out:", err);
+//             return res.status(500).send("Error logging out after account deletion.");
+//           }
+//           req.session.destroy(err => {
+//             if (err) {
+//               console.error("Error destroying session:", err);
+//               return res.status(500).send("Error destroying session after account deletion.");
+//             }
+//             res.clearCookie("connect.sid"); // Clear the session cookie
+//             return res.send("Account deleted successfully and session terminated.");
+//           });
+//         });
+//       } else {
+//         // Admin deleting another user's account
+//         res.json({ message: "User deleted successfully." });
+//       }
+//     })
+//     .catch(err => {
+//       console.error("Error deleting user:", err);
+//       res.status(500).send("Internal Server Error.");
+//     });
+// });
+// Updated delete route to handle projects instead of users
+app.delete("/projects/:id", ensureAuthenticated, function (req, res) {
+  const projectId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    return res.status(400).send("Invalid project ID format.");
   }
 
-  // Check authorization
-  if (req.user._id.toString() !== userId && req.user.role !== "admin") {
-    return res.status(403).send("Forbidden: You are not allowed to delete this user.");
-  }
-
-  // Perform the delete operation
-  User.findByIdAndDelete(userId)
-    .then(deletedUser => {
-      if (!deletedUser) {
-        return res.status(404).send("User not found.");
+  Project.findById(projectId)
+    .then(project => {
+      if (!project) {
+        return res.status(404).send("Project not found.");
+      }
+      
+      // Check if user is owner or admin
+      if (project.owner.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+        return res.status(403).send("Forbidden: You are not authorized to delete this project.");
       }
 
-      // If the currently logged-in user is deleting their own account, log them out
-      if (req.user._id.toString() === userId) {
-        req.logout(err => {
-          if (err) {
-            console.error("Error logging out:", err);
-            return res.status(500).send("Error logging out after account deletion.");
-          }
-          req.session.destroy(err => {
-            if (err) {
-              console.error("Error destroying session:", err);
-              return res.status(500).send("Error destroying session after account deletion.");
-            }
-            res.clearCookie("connect.sid"); // Clear the session cookie
-            return res.send("Account deleted successfully and session terminated.");
-          });
-        });
-      } else {
-        // Admin deleting another user's account
-        res.json({ message: "User deleted successfully." });
-      }
+      return Project.findByIdAndDelete(projectId);
+    })
+    .then(() => {
+      res.json({ message: "Project deleted successfully." });
     })
     .catch(err => {
-      console.error("Error deleting user:", err);
+      console.error("Error deleting project:", err);
       res.status(500).send("Internal Server Error.");
     });
 });
 
 
 app.post("/register", function (req, res) {
-
   User.register({ username: req.body.username }, req.body.password, function (err, user) {
     if (err) {
       console.log(err);
@@ -222,7 +283,6 @@ app.post("/register", function (req, res) {
       });
     }
   });
-
 });
 
 
@@ -252,52 +312,71 @@ app.post('/logout', (req, res) => {
 });
 
 
-app.post("/submit", ensureAuthenticated, function (req, res) {
-  User.findById(req.user._id)
-    .then(foundUser => {
-      if (foundUser) {
-        foundUser.project = req.body.project;
-        foundUser.email = req.body.email;
-        foundUser.percent_done = req.body.percent_done;
-        foundUser.description = req.body.description;
-        return foundUser.save();
+// Updated submit route to create new project
+app.post('/submit', authenticateToken, async (req, res) => {
+  try {
+      // First, check if the user exists in MongoDB
+      const user = await User.findOne({ email: req.user.email });
+      
+      if (!user) {
+          return res.status(404).json({ 
+              error: 'User not found in database. Please complete your profile first.' 
+          });
       }
-      return null;
+
+      // If user exists, proceed with project creation
+      const project = new Project({
+          title: req.body.title,
+          description: req.body.description,
+          percentDone: req.body.percent_done,
+          // TODO Add Tags
+          owner: user._id,  // Use the MongoDB user._id instead of req.user.id
+          contributors: [req.user._id] // Owner is automatically a contributor
+      });
+
+      await project.save();
+      res.status(201).json({ message: 'Project created successfully', project });
+
+  } catch (error) {
+      console.error('Error in /submit route:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Updated update route to handle project updates
+app.post("/update/:id", ensureAuthenticated, function (req, res) {
+  const projectId = req.params.id;
+  
+  Project.findById(projectId)
+    .then(project => {
+      if (!project) {
+        return res.status(404).send("Project not found");
+      }
+
+      // Check if user is owner or contributor
+      // Reject the user if they are not owner and not one of the contributors.
+      if (project.owner.toString() !== req.user._id.toString() && 
+          !project.contributors.some(c => c.toString() === req.user._id.toString())) {
+        return res.status(403).send("Forbidden: You are not authorized to update this project.");
+      }
+
+      // Update project fields
+      project.title = req.body.project;
+      project.description = req.body.description;
+      project.percentDone = req.body.percent_done;
+      project.updatedAt = Date.now();
+
+      return project.save();
     })
     .then(() => {
       res.redirect("/project_tables");
     })
     .catch(err => {
-      console.log(err);
-      res.status(500).send("An error occurred while sumitting your project.");
-    });
-});
-
-
-app.post("/update/:id", ensureAuthenticated, function (req, res) {
-  // Check if the authenticated user is authorized to update this record
-  if (req.user._id.toString() !== req.params.id) {
-    return res.status(403).send("Forbidden: You are not allowed to update this project.");
-  }
-
-  // Validate and sanitize input fields
-  const { project, percent_done, description } = req.body;
-
-  // Update the user with only allowable fields
-  User.findByIdAndUpdate(req.params.id, { project, percent_done, description }, { new: true })
-    .then(updatedUser => {
-      if (updatedUser) {
-        res.redirect("/project_tables");
-      } else {
-        res.status(404).send("User/Project not found");
-      }
-    })
-    .catch(err => {
-      console.error("Error updating user:", err);
+      console.error("Error updating project:", err);
       res.status(500).send("An unexpected error occurred.");
     });
 });
-
 
 
 // Code needed for Railway deploy  
