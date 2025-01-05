@@ -273,7 +273,7 @@ app.delete("/projects/:id", ensureAuthenticated, function (req, res) {
 
 
 app.post("/register", function (req, res) {
-  User.register({ username: req.body.username }, req.body.password, function (err, user) {
+  User.register({ username: req.body.username, email: req.body.email }, req.body.password, function (err, user) {
     if (err) {
       console.log(err);
       res.redirect("/register");
