@@ -61,11 +61,17 @@ app.get("/", function (req, res) {
 
 
 app.get("/login", function (req, res) {
+  if (req.isAuthenticated()) {
+    return res.redirect("/projects/project_tables", { user: req.user });
+  }
   res.render("login");
 });
 
 
 app.get("/register", function (req, res) {
+  if (req.isAuthenticated()) {
+    return res.redirect("/projects/project_tables", { user: req.user });
+  }
   res.render("register");
 });
 
