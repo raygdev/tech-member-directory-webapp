@@ -39,7 +39,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         const project = new Project({
             title: req.body.title,
             description: req.body.description,
-            percentDone: req.body.percent_done,
+            percentDone: Number(req.body.percent_done),
             // TODO Add Tags
             ownerId: user._id,  // Use the MongoDB user._id instead of req.user.id
             ownerDisplayName: user.DisplayName,
