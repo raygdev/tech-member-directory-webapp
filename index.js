@@ -14,9 +14,12 @@ const app = express();
 
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
+// Middleware to parse URL-encoded request bodies
+app.use(express.urlencoded({ extended: true }));
 
 // Initialize MongoDB Session Store
 const sessionStore = new MongoDBStore({
@@ -76,15 +79,6 @@ app.get("/register", function (req, res) {
 });
 
 
-app.get("/submit", function (req, res) {
-  if (req.isAuthenticated()) {
-    res.render("submit");
-  } else {
-    res.redirect("/login");
-  }
-});
-
-
 app.get("/logout", function (req, res) {
   req.session.destroy((err) => {
     if (err) {
@@ -114,6 +108,7 @@ app.post("/register", function (req, res) {
 
 
 app.post("/login", function (req, res) {
+  // TODO Users can send a capitalized username if they target this route directly
   passport.authenticate("local", function (err, user, info) {
     if (err) {
       console.log(err);

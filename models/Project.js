@@ -13,13 +13,24 @@ const projectSchema = new mongoose.Schema({
     default: 0
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
   },
   contributors: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
   }],
   createdAt: {
     type: Date,
