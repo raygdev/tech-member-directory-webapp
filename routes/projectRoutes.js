@@ -127,17 +127,17 @@ router.delete("/:id", ensureAuthenticated, async function (req, res) {
 
 // These routes serve the pages that list projects.
 // We don't require authentication for this page. Anyone can view projects.
-router.get(["/project_tables", "/project_cards"], function (req, res) {
+router.get(["/tables", "/cards"], function (req, res) {
     console.log("Authenticated");
     Project.find()
         .populate('owner', 'username email')
         .populate('contributors', 'username email')
         .then(function (projects) {
             console.log("projects", projects);
-            if (req.url === "/project_tables") {
-                res.render("project_tables", { projects, user: req.user });
-            } else if (req.url === "/project_cards") {
-                res.render("project_cards", { projects, user: req.user });
+            if (req.url === "/tables") {
+                res.render("tables", { projects, user: req.user });
+            } else if (req.url === "/cards") {
+                res.render("cards", { projects, user: req.user });
             }
         })
         .catch(function (err) {
