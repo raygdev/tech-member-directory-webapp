@@ -1,13 +1,24 @@
-# Run this non-default docker-compose file with:
-#   docker-compose -f docker-compose.local.yaml up
-#   or
-#   docker compose -f docker-compose.local.yaml up
-# 
-# Stop this non-default docker-compose file with:
-#   docker-compose -f docker-compose.local.yaml down
-#   or
-#   docker compose -f docker-compose.local.yaml down
-# 
+# Local Development Environment Setup
+#
+# Prerequisites:
+# - Docker installed on your machine
+# - Environment file (.env.development.local) in the env folder
+#   Copy from .env.development.local.sample as a template
+#
+# To start the application (run one of the following commands):
+#   docker-compose -f docker-compose.local.yaml up        # Traditional syntax
+#   docker compose -f docker-compose.local.yaml up        # New Docker Compose syntax
+#   docker-compose -f docker-compose.local.yaml up -d     # Run in detached mode
+#
+# To stop the application (run one of the following commands):
+#   docker-compose -f docker-compose.local.yaml down      # Traditional syntax
+#   docker compose -f docker-compose.local.yaml down      # New Docker Compose syntax
+#
+# Additional useful commands:
+#   docker-compose -f docker-compose.local.yaml ps        # List running containers
+#   docker-compose -f docker-compose.local.yaml logs      # View logs
+#   docker-compose -f docker-compose.local.yaml logs -f   # Follow logs in real-time
+
 services:
   app:
     build: .
