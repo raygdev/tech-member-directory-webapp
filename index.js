@@ -65,7 +65,7 @@ app.get("/", function (req, res) {
 
 app.get("/login", function (req, res) {
   if (req.isAuthenticated()) {
-    return res.redirect("/projects/project_tables", { user: req.user });
+    return res.redirect("/projects/tables", { user: req.user });
   }
   res.render("login");
 });
@@ -73,7 +73,7 @@ app.get("/login", function (req, res) {
 
 app.get("/register", function (req, res) {
   if (req.isAuthenticated()) {
-    return res.redirect("/projects/project_tables", { user: req.user });
+    return res.redirect("/projects/tables", { user: req.user });
   }
   res.render("register");
 });
@@ -100,7 +100,7 @@ app.post("/register", function (req, res) {
       res.redirect("/register");
     } else {
       passport.authenticate("local")(req, res, function () {
-        res.redirect("/projects/project_cards");
+        res.redirect("/projects/cards");
       });
     }
   });
@@ -122,7 +122,7 @@ app.post("/login", function (req, res) {
         console.log(err);
         return res.redirect("/login"); // Redirect if login fails
       }
-      return res.redirect("/projects/project_tables"); // Successful login
+      return res.redirect("/projects/tables"); // Successful login
     });
   })(req, res);
 });
