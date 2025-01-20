@@ -1,5 +1,7 @@
-  body {
-  background-color: #deb887;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
    }
 
 .centered {
