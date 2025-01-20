@@ -9,6 +9,19 @@
     text-align: center;
 }
 
+
+.logo-image {
+  width: 3.43rem;
+  height: 3rem;
+  margin: 0;
+  border-radius: .25rem;
+}
+
+img {
+  display: block;
+  width: 100%;
+}
+
 .projects-text {
   text-align: center;
   font-size: 2rem;
