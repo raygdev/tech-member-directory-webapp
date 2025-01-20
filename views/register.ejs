@@ -1,13 +1,13 @@
 <%- include('partials/header') %>
-<div class="container mt-5">
-  <h1>Register</h1>
-
+<div class="container my-5">
+    
   <div class="row">
-    <div class="col-sm-8">
-      <div class="card">
+    <div class="col-sm-8 mx-auto">
+      <div class="card mx-auto py-5 px-2 shadow" style="max-width: 36.625rem">
+        <h1 class="mx-auto">Register</h1>
         <div class="card-body">
           <!-- Makes POST request to /register route -->
-          <form action="/register" method="POST" id="signupForm">
+          <form class="d-flex flex-column" action="/register" method="POST" id="signupForm">
             <div class="form-group">
               <label for="username">Username</label>
               <input
@@ -35,7 +35,7 @@
                 id="password"
               />
             </div>
-            <button type="submit" class="btn btn-dark">Register</button>
+            <button type="submit" class="btn btn-primary align-self-center mt-4">Register</button>
           </form>
         </div>
       </div>
