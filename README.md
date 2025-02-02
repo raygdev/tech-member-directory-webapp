@@ -16,6 +16,56 @@ Remember to create a .env file and add ```node_modules``` along with any other v
 
 A rudimentary deployment of the website is on the railway platform and can be accessed by https://casualcoding21-production.up.railway.app/.  
 
+### Local Development with Docker
+
+Instead of installing Node.js and MongoDB directly on your system, you can run the entire development environment inside **containers** using Docker.  
+
+#### What Are Containers, and Why Use Them?  
+
+Containers are lightweight, isolated environments that package everything your application needs to run—including code, dependencies, and configuration.  
+
+**Benefits of using containers:**  
+- **Consistency:** Ensures the app runs the same way on all systems, avoiding "it works on my machine" issues.  
+- **Simplicity:** No need to manually install Node.js, MongoDB, or other dependencies on your machine.  
+- **Easy Cleanup:** Containers can be stopped and removed without leaving behind system-wide changes.  
+
+---
+
+### Getting Started with Docker  
+
+#### 1. Install Docker  
+- The easiest way is to install **Docker Desktop**, which includes Docker Compose.  
+- Alternatively, install Docker Engine and `docker-compose` separately.  
+
+#### 2. (Optional) Install the VS Code Docker Extension  
+- If you're using VS Code, this extension helps manage containers and images.  
+
+#### 3. Run the Development Environment  
+1. Follow the instructions in `docker-compose-local.yaml` to start and stop all containerized services.  
+2. Once running:  
+   - The Express server and MongoDB database will be containerized.  
+   - Logs from both services will appear in the same terminal.  
+
+#### 4. Stopping and Cleaning Up  
+- To stop the containers:  
+  ```sh
+  docker-compose -f docker-compose-local.yaml down
+  ```
+
+
+### Docker Troubleshooting
+If you think your code and configuration is correct, but the app or Mongo isn't working correctly, try one of the following: 
+1. Run the following to rebuild Docker layers:
+```
+docker-compose up --build
+```
+2. Reset the environment volumes:
+```
+docker compose down -v
+docker compose up
+```
+
+
 ## Tech Stack
 [mongoose]: https://mongoosejs.com/
 [mongodb]: https://www.mongodb.com/atlas/database
