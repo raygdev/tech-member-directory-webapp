@@ -1,0 +1,38 @@
+@startuml
+title Casual Coding Member Directory - 2024-12-15
+
+participant Browser
+participant App
+participant Passport #lightgreen
+participant "Mongo\nmySession" as MySession #lightblue
+participant "Mongo\nusers" as Users #lightblue
+participant "Mongo\nprojects" as Projects #lightblue
+
+activate Browser
+
+== POST /register ==
+Browser -> App : POST /register\n- username\n- password
+activate App
+App -> Passport: register user
+activate Passport
+alt error
+  Passport -> Users: create user record\n- username\n- hashed password\n- salt
+  activate Users
+  Users --> Passport: response
+  note over Passport: TODO An error can occur here
+  deactivate Users
+  Passport -> MySession: log new user in\n(i.e., create session)
+  activate MySession
+  MySession --> Passport
+  deactivate MySession
+  Passport --> App: user record
+  deactivate Passport
+  App --> Browser: redirect to /project_cards
+else
+  App -> App: Redirect to /register
+  App --> Browser: redirect to /register\n error message
+  deactivate App
+end
+
+deactivate Browser
+@enduml

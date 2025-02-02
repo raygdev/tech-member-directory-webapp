@@ -1,0 +1,51 @@
+@startuml
+title Casual Coding Member Directory - 2024-12-15
+
+participant Browser
+participant App
+participant Passport #lightgreen
+participant "Mongo\nmySession" as MySession #lightblue
+participant "Mongo\nusers" as Users #lightblue
+participant "Mongo\nprojects" as Projects #lightblue
+
+activate Browser
+
+== POST /update/:id ==
+Browser -> App: POST /update/:id\n- project\n- percent_done\n- description
+activate App
+'MIDDLEWARE
+App -> Passport: ensureAuthenticated
+activate Passport
+Passport -> Passport: get user data from req
+note over Passport: checking for an active session
+Passport -> MySession: req.isAuthenticated()\n- user
+activate MySession
+MySession --> Passport: response
+deactivate MySession
+Passport --> App: response
+deactivate Passport
+alt user is not authenticated
+  App --> Browser: redirect to /login
+else user is authenticated
+  App -> App: Does the user own the project?
+  alt The user is NOT the owner
+    App -> Browser: 403 - Forbidden
+  else The user is the owner
+    App -> Users: Update project document\n- id\n- project\n- percent_done\n- description
+    activate Users
+    Users -> App: respone
+    deactivate Users
+    alt response is an updated document
+      App --> Browser: redirect to /project_tables\n- user/project data
+    else user/project not found
+      App --> Browser: User/Project not found
+    end
+  else error
+    App -> App: log the error
+    App --> Browser: error message
+    deactivate App
+  end
+end
+
+deactivate Browser
+@enduml

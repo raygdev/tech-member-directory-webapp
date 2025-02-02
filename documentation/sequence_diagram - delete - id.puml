@@ -1,0 +1,90 @@
+@startuml
+title Casual Coding Member Directory - 2025-01-01
+
+participant Browser
+participant App
+participant Passport #lightgreen
+participant "Mongo\nmySession" as MySession #lightblue
+participant "Mongo\nusers" as Users #lightblue
+participant "Mongo\nprojects" as Projects #lightblue
+
+activate Browser
+
+== DELETE /delete/:id ==
+Browser -[#blue]> App: <color #blue>DELETE /delete/:id</color>
+activate App
+'MIDDLEWARE
+App -[#blue]> Passport: <color #blue>ensureAuthenticated</color>
+activate Passport
+Passport -[#blue]> Passport: <color #blue>get user data from req</color>
+note over Passport: checking for an active session
+Passport -[#blue]> MySession: <color #blue>req.isAuthenticated()</color>\n<color #blue>- user</color>
+activate MySession
+MySession --[#blue]> Passport: <color #blue>response</color>
+deactivate MySession
+Passport --[#blue]> App: <color #blue>response</color>
+deactivate Passport
+alt user is not authenticated
+  App --> Browser: redirect to /login
+else user is authenticated
+'  const userId = req.params.id;
+  App -[#blue]> App: <color #blue>Is the user ID a valid</color>\n<color #blue>MongoDB objectId format?</color
+  alt Invalid format
+    App --> Browser: 400 - error message
+  else the input is a valid MongoDB objectId
+    ' Check authorization
+    App -[#blue]> App: <color #blue>Does the user own the account and</color>\n<color #blue>is the user NOT an admin?</color>
+    alt The user is not the owner and is not an admin
+      App --> Browser: 403 - error message\n- Not allowed
+    else <color #blue>The user is the owner or an admin</color>
+      ' Perform the delete operation
+      '  User.findByIdAndDelete(userId)
+      App -[#blue]> Users: <color #blue>delete document</color\n<color #blue>- id</color>
+      activate Users
+      Users --[#blue]> App: <color #blue>respone</color>
+      deactivate Users
+      '    .then(deletedUser => {
+      alt user not found
+        App -> Browser: 404 - error: user not found
+      else
+        App -[#blue]> App: <color #blue>Who is the user?</color>
+        alt <color #blue>user is the account owner</color>
+          ' The currently logged-in user is deleting their own account, log them out
+          App -[#blue]> Passport: <color #blue>Log the user out.</color>\n<color #blue>req.logout()</color>
+          activate Passport
+          Passport -[#blue]> MySession: <color #blue>delete the session</color>
+          activate MySession
+          MySession -[#blue]> Passport: <color #blue>respone</color>
+          deactivate MySession
+          Passport -[#blue]> App: <color #blue>respone</color>
+          deactivate Passport
+          alt logout error
+            App -> App: Log the logout error
+            App -> Browser: 500 - error: Error logging out after account deletion
+          else user is logged out
+            App -[#blue]> Passport: <color #blue>destroy the session</color>\n <color #blue>req.session.destroy()</color>
+            activate Passport
+            Passport -[#blue]> App: <color #blue>respone</color>
+            deactivate Passport
+            alt error deleting the session
+              App -> App: Log the error - Error destroying session.
+              App-> Browser: 500 - error - Error destroying session after account deletion.
+            else the session was successfully deleted
+              App -[#blue]> App: <color #blue>Clear the session cookie</color>
+              App -[#blue]> Browser: <color #blue>"Account deleted successfully and session terminated."</color>
+            end
+          end
+        else <color #blue>user is an admin</color>
+          App --> Browser: <color #blue>user deleted successfully</color>
+        end
+      else error
+        App -> App: log error deleting user
+        App --> Browser: error message - Internal Server Error
+        deactivate App
+      end
+    end
+  end
+end
+
+deactivate Browser
+@enduml

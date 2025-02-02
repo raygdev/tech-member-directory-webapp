@@ -6,20 +6,22 @@
     <div class="col-sm-8">
       <div class="card">
         <div class="card-body">
-
           <!-- Makes POST request to /login route -->
-          <form action= "/login" method="POST">
+          <form action="/login" method="POST" id="loginForm">
             <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" class="form-control" name="username">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" name="username" id="username"/>
             </div>
+            <!-- <div class="form-group"> -->
+              <!-- <label for="email">Email</label> -->
+              <!-- <input type="email" class="form-control" name="email"> -->
+            <!-- </div> -->
             <div class="form-group">
               <label for="password">Password</label>
-              <input type="password" class="form-control" name="password">
+              <input type="password" class="form-control" name="password" id="password"/>
             </div>
             <button type="submit" class="btn btn-dark">Login</button>
           </form>
-
         </div>
       </div>
     </div>
@@ -34,8 +36,16 @@
         </div>
       </div>
     </div> -->
-
   </div>
 </div>
+
+<script>
+  const loginForm = document.getElementById("loginForm");
+
+  loginForm.addEventListener("submit", async function (event) {
+    const usernameInput = document.querySelector("#username");
+    usernameInput.value = usernameInput.value.toLowerCase();
+  });
+</script>
 
 <%- include('partials/footer') %>

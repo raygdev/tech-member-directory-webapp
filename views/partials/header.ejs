@@ -8,20 +8,20 @@
   <title>Casual Coding</title>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 
 <body>
-    <img src = "images/CC-LogoWname-ColorBg.png" id = "logo">
+    <img src = "/images/CC-LogoWname-ColorBg.png" id = "logo">
 
     <!-- <nav id="navigation">
       <ul>
         <li><a href="/">Register</a></li>
         <li><a href="/Login">Login</a></li>
         <li><a href="/Submit">Submit Project</a></li>
-        <li><a href="/project_cards">Projects (Cards)</a></li>
-        <li><a href="/project_tables">Projects (Table)</a></li>
+        <li><a href="/cards">Projects (Cards)</a></li>
+        <li><a href="/tables">Projects (Table)</a></li>
         </ul>
       <button id="menu-btn" onclick="toggleMenu()">&#9776;</button> </nav>  -->
  
@@ -34,11 +34,17 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href="/Register">Register</a>
-              <a class="nav-link" href="/Login">Login</a>
-              <a class="nav-link" href="/Submit">Submit Project</a>
-              <a class="nav-link" href="/project_cards">Project Cards</a>
-              <a class="nav-link" href="/project_tables">Project Table</a>
+              <% if (!locals.user) { %>
+                <a class="nav-link active" aria-current="page" href="/Register">Register</a>
+                <a class="nav-link" href="/login">Login</a>
+              <% } %>
+              <a class="nav-link" href="/projects/submit">Submit Project</a>
+              <a class="nav-link" href="/projects/cards">Project Cards</a>
+              <a class="nav-link" href="/projects/tables">Project Table</a>
+              <% if (locals.user) { %>
+                <a class="nav-link" href="#"><i class="fa fa-user-circle" style="font-size:24px"></i> Hello, <%= locals.user.username %></a>
+                <a class="nav-link" href="/logout"> Logout <i class="fa fa-sign-out-alt" style="font-size:24px"></i></a>
+              <% } %>
               <!-- <a class="nav-link disabled" aria-disabled="true">Disabled</a> -->
             </div>
           </div>
