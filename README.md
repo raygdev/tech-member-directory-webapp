@@ -50,6 +50,7 @@ Containers are lightweight, isolated environments that package everything your a
 - To stop the containers:  
   ```sh
   docker-compose -f docker-compose-local.yaml down
+  ```
 
 
 ### Docker Troubleshooting
