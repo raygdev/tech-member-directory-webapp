@@ -1,5 +1,4 @@
 const express = require("express");
-const express = require("express");
 const router = express.Router();
 const { Project, User } = require("../models/index.js");
 const ensureAuthenticated = require("../middleware/auth.js");
@@ -61,9 +60,9 @@ router.post('/', ensureAuthenticated, upload.single('projectImage'), async (req,
 
         const project = new Project(projectData);
         await project.save();
-        
-        res.status(201).json({ 
-            message: 'Project created successfully', 
+
+        res.status(201).json({
+            message: 'Project created successfully',
             project: {
                 ...project.toObject(),
                 image: project.image ? true : false // Don't send image data in response
@@ -72,9 +71,9 @@ router.post('/', ensureAuthenticated, upload.single('projectImage'), async (req,
 
     } catch (error) {
         console.error('Error in /submit route:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Internal server error',
-            details: error.message 
+            details: error.message
         });
     }
 });
@@ -86,7 +85,80 @@ router.get('/image/:id', async (req, res) => {
         if (!project || !project.image || !project.image.data) {
             return res.status(404).send('No image found');
         }
-        
+
+        res.set('Content-Type', project.image.contentType);
+        res.send(project.image.data);
+    } catch (error) {
+        console.error('Error serving image:', error);
+        res.status(500).send('Error serving image');
+    }
+});
+
+
+// Create new project with image upload
+router.post('/', ensureAuthenticated, upload.single('projectImage'), async (req, res) => {
+    try {
+        // First, check if the user exists in MongoDB
+        const user = await User.findOne({ username: req.user.username });
+        if (!user) {
+            return res.status(404).json({
+                error: 'User not found in database. Please complete your profile first.'
+            });
+        }
+
+        // Create project object
+        const projectData = {
+            title: req.body.title,
+            description: req.body.description,
+            percentDone: Number(req.body.percentDone),
+            owner: {
+                _id: user._id,
+                username: user.username
+            },
+            contributors: [{
+                _id: user._id,
+                username: user.username
+            }],
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+
+        // If an image was uploaded, add it to the project data
+        if (req.file) {
+            projectData.image = {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            };
+        }
+
+        const project = new Project(projectData);
+        await project.save();
+
+        res.status(201).json({
+            message: 'Project created successfully',
+            project: {
+                ...project.toObject(),
+                image: project.image ? true : false // Don't send image data in response
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in /submit route:', error);
+        res.status(500).json({
+            error: 'Internal server error',
+            details: error.message
+        });
+    }
+});
+
+// Add a route to serve project images
+router.get('/image/:id', async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project || !project.image || !project.image.data) {
+            return res.status(404).send('No image found');
+        }
+
         res.set('Content-Type', project.image.contentType);
         res.send(project.image.data);
     } catch (error) {
@@ -103,13 +175,11 @@ const mongoose = require("mongoose");
 
 // Create new project
 router.post("/", ensureAuthenticated, async (req, res) => {
-router.post("/", ensureAuthenticated, async (req, res) => {
     try {
         // First, check if the user exists in MongoDB
         const user = await User.findOne({ username: req.user.username });
         if (!user) {
             return res.status(404).json({
-                error: "User not found in database. Please complete your profile first.",
                 error: "User not found in database. Please complete your profile first.",
             });
         }
@@ -126,12 +196,6 @@ router.post("/", ensureAuthenticated, async (req, res) => {
                 username: user.username,
                 username: user.username,
             },
-            contributors: [
-                {
-                    _id: user._id,
-                    username: user.username,
-                },
-            ], // Owner is automatically a contributor
             contributors: [
                 {
                     _id: user._id,
@@ -309,4 +373,3 @@ router.get("/edit/:id", ensureAuthenticated, function (req, res) {
 
 
 module.exports = router;
-
