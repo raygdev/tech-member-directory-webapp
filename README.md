@@ -84,11 +84,12 @@ docker compose up
 
 ## Tech Stack
 
-[mongoose]: https://mongoosejs.com/
-[mongodb]: https://www.mongodb.com/atlas/database
-[node.js]: http://nodejs.org
-[express]: http://expressjs.com
-[EJS]: http://ejs.co/
+mongoose: https://mongoosejs.com
+mongodb: https://www.mongodb.com/atlas/database
+node.js: http://nodejs.org
+express: http://expressjs.com
+ejs: http://ejs.com
+
 Authentication is implemented through the use of hashing, salting, Sessions, and Passport.
 The website is built using Javascript and has a Mongo database, which stores three attributes for the user: email, project, and percent_done.
 
