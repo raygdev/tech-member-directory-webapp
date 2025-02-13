@@ -1,4 +1,5 @@
 const express = require("express");
+const express = require("express");
 const router = express.Router();
 const { Project, User } = require("../models/index.js");
 const ensureAuthenticated = require("../middleware/auth.js");
@@ -95,14 +96,20 @@ router.get('/image/:id', async (req, res) => {
 });
 
 
+const { Project, User } = require("../models/index.js");
+const ensureAuthenticated = require("../middleware/auth.js");
+
+const mongoose = require("mongoose");
 
 // Create new project
+router.post("/", ensureAuthenticated, async (req, res) => {
 router.post("/", ensureAuthenticated, async (req, res) => {
     try {
         // First, check if the user exists in MongoDB
         const user = await User.findOne({ username: req.user.username });
         if (!user) {
             return res.status(404).json({
+                error: "User not found in database. Please complete your profile first.",
                 error: "User not found in database. Please complete your profile first.",
             });
         }
@@ -117,7 +124,14 @@ router.post("/", ensureAuthenticated, async (req, res) => {
             owner: {
                 _id: user._id,
                 username: user.username,
+                username: user.username,
             },
+            contributors: [
+                {
+                    _id: user._id,
+                    username: user.username,
+                },
+            ], // Owner is automatically a contributor
             contributors: [
                 {
                     _id: user._id,
