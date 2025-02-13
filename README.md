@@ -18,6 +18,10 @@ Members interested in participating in this project will be assigned coding task
 
 ## App Development Process
 
+Developers wishing to contribute to development of the webapp need to work from the task list in the Projects folder for the account holding the repository: https://github.com/orgs/casual-coding-atl/projects. 
+
+Experienced coders can select a task and get it assigned. Novice coders will need to team with an experienced coder as a mentor and work under the supervision of the mentor coder. 
+
 This section of Readme.md covers basic process to setup a development environment to work on the app. Use of Docker images/containers are essential to working on app tasks, on your laptop.
 
 The App uses [NPM](https://www.npmjs.com/) Node Package Manager to manage it's dependencies and packages.
