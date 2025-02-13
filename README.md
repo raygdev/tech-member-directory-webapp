@@ -2,7 +2,7 @@
 
 ## What are we building?
 
-This repository contains node/js/ejs code for the Member Profile Website of the Casual Coding Group. The webapp has been deployed in digitalocean and can be found at  https://casual-app-sa242.ondigitalocean.app/. It is for use by Casual Coding members by and provides a forum for collaboration on individual member coding projects and app development. Members are able to record and share information on:
+This repository contains node/js/ejs code for the Member Profile Website of the Casual Coding Group. The webapp has been deployed in digitalocean and can be found at  https://casual-app-sa242.ondigitalocean.app/. It is for use by Casual Coding members and provides a forum for collaboration on individual member coding projects and app development. Members are able to record and share information on:
 
 * Details of member app projects, started or in progress. See the project card and project table webpages of the webapp.
 
