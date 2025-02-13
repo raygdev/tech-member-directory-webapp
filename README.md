@@ -1,26 +1,42 @@
-# Casual_Coding_2.4. 
+# Tech-Member-Directory-Webapp
+
 ## What are we building?
-This repository contains development code intended for the Member Profile Website of the Casual Coding Group.
 
-The website intends to facilitate Casual Coding membership and collaboration for coding projects among members.
+This repository contains node/js/ejs code for the Member Profile Website of the Casual Coding Group. The webapp has been deployed in digitalocean and can be found at  https://casual-app-sa242.ondigitalocean.app/. It is for use by Casual Coding members by and provides a forum for collaboration on individual member coding projects and app development. Members are able to record and share information on:
 
-## Development
-This App uses [NPM](https://www.npmjs.com/) Node Package Manager to manage it's dependencies and packages.
+* Details of member app projects, started or in progress. See the project card and project table webpages of the webapp.
 
-Developers should clone the repository and load the folder into Visual Studio Code.
-To clone the master branch use ```git clone -b master [git url]```.
+* For experienced coders, contact information, summary of coding skills (front end, backend, full stack, etc.) and time availability of experienced coders, to mentor novice developers and complete coding tasks.
 
-From the root directory run ```npm install``` to install all of the dependencies.
+* Basic contact information provided by novice developers, interested in learning specific coding skills, or building experience.
+
+The Casual Coding webapp, itself, facilitates collaboration by members. It is a work-in-progress and allows experienced coders and novice coders to actively collaborate in its development. Coding tasks for the project can be found at: 
+
+https://github.com/orgs/casual-coding-atl/projects/
+
+Members interested in participating in this project will be assigned coding tasks from this list.
+
+## App Development Process
+
+This section of Readme.md covers basic process to setup a development environment to work on the app. Use of Docker images/containers are essential to working on app tasks, on your laptop.
+
+The App uses [NPM](https://www.npmjs.com/) Node Package Manager to manage it's dependencies and packages.
+
+Developers should clone the repository and load the folder into Visual Studio Code. Install the Docker extension of VS Code. You will build the Docker app image and containers in VS Code.
+
+Acquire a copy of the repository by cloning the main branch, use ```git clone -b main [git url]```.
+
+From the root directory run ```npm install``` to install all of the node dependencies.
 
 Remember to create a .env file and add ```node_modules``` along with any other values you might need.
 
-A rudimentary deployment of the website is on the railway platform and can be accessed by https://casualcoding21-production.up.railway.app/.  
+For the app to handle images for the projects loaded in the Mongo Database, install the multer package, using npm i multer.
 
 ### Local Development with Docker
 
-Instead of installing Node.js and MongoDB directly on your system, you can run the entire development environment inside **containers** using Docker.  
+To work on development tasks for the app, on your local machine, we encourage you to install docker and use entire development environment inside **containers** using Docker.  
 
-#### What Are Containers, and Why Use Them?  
+### What Are Containers, and Why Use Them?  
 
 Containers are lightweight, isolated environments that package everything your application needs to run—including code, dependencies, and configuration.  
 
@@ -67,6 +83,7 @@ docker compose up
 
 
 ## Tech Stack
+
 [mongoose]: https://mongoosejs.com/
 [mongodb]: https://www.mongodb.com/atlas/database
 [node.js]: http://nodejs.org
@@ -102,3 +119,16 @@ The website is built using Javascript and has a Mongo database, which stores thr
 - Creator: Close issue
 
 _Credit for list_ : **puffalo**
+
+
+## Documentation folder contents in tech-member-directory-webapp repository
+
+This folder is for the developer to review and analyze the routes of the app, and other technical aspects of the code. These are png, pdf and puml files.
+
+## Codespace
+
+To further facilitate work, developers can setup codespace for a repository branch created for by the developer for task completion from the task list. Once created, the codespace for the branch will require the programmer to run docker to launch the app. Reference github help documentation to create the codespace.
+
+## CodeOwner file
+
+To assist project leadership to manage the development process of the app, a Git CodeOwner file has been created to track ownership of the development branches. Again, reference github documentation online for help.
