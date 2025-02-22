@@ -77,7 +77,7 @@ Containers are lightweight, isolated environments that package everything your a
 If you think your code and configuration is correct, but the app or Mongo isn't working correctly, try one of the following: 
 1. Run the following to rebuild Docker layers:
 ```
-docker-compose up -f docker-compose-local.yaml --build
+docker-compose -f docker-compose-local.yaml up --build
 ```
 2. Reset the environment volumes:
 ```
