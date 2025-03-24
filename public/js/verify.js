@@ -2,7 +2,8 @@ const form = document.querySelector("form");
 const code = document.getElementById("code");
 const feedback = document.querySelector(".invalid-feedback");
 const search = new URLSearchParams(window.location.search)
-console.log(search.get('userid'))
+const resendButton = document.getElementById('resend')
+const resendInfo = document.getElementById('resend-info')
 
 form.setAttribute('action', `/verify?userid=${search.get('userid')}`)
 
@@ -39,3 +40,32 @@ form.addEventListener("submit", function (e) {
     listenerForInput("Code Must Be 6 Digits");
   }
 });
+
+resendButton.addEventListener('click', async function(e){
+  this.setAttribute('disabled', true)
+  try {
+    const verification = await fetch(`/resend?userid=${search.get('userid')}`, {
+      method: 'POST',
+      "Content-Type": 'application/json'
+    })
+  
+    const { message } = await verification.json()
+
+    if(verification.status !== 200) {
+      throw await verification.json()
+    }
+
+    resendInfo.textContent = message
+
+    setTimeout(() => {
+      resendInfo.textContent = ''
+    }, 6000)
+
+  } catch(error) {
+    const { message } = error
+    resendInfo.textContent = message
+  } finally {
+    this.removeAttribute('disabled', false)
+  }
+
+})
