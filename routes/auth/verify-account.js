@@ -20,7 +20,7 @@ const postVerifyAccount = async (req, res) => {
       return;
     }
 
-    if (code !== verification.code) {
+    if (parseInt(code) !== verification.code) {
       res.render("auth/verify", {
         error: "Your code doesn't match",
       });
