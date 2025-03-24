@@ -30,6 +30,9 @@ const postVerifyAccount = async (req, res) => {
     //TODO: Implement after asking about **when** to authenticate
     // if the code matches
     // authenticate the user and redirect to /projects/tables ?
+    await Verification.findOneAndDelete({ _id: verification._id })
+    res.redirect('login')
+
   } catch (error) {
     console.log(error);
     res.render("auth/verify", {
