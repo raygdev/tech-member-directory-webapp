@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const { promisify } = require('util')
 
 let mailOptions;
 
@@ -30,4 +31,4 @@ if (process.env.NODE_ENV !== "production") {
 
 const transporter = nodemailer.createTransport(mailOptions);
 
-module.exports = transporter;
+module.exports = promisify(transporter.sendMail.bind(transporter));
