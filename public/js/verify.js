@@ -1,6 +1,10 @@
 const form = document.querySelector("form");
 const code = document.getElementById("code");
 const feedback = document.querySelector(".invalid-feedback");
+const search = new URLSearchParams(window.location.search)
+console.log(search.get('userid'))
+
+form.setAttribute('action', `/verify?userid=${search.get('userid')}`)
 
 const listenerForInput = (text) => {
   code.addEventListener("input", function (e) {
