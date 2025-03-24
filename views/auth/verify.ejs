@@ -1,5 +1,5 @@
 <%- include('../partials/header') %>
-<div class="container mx-auto">
+<div id="container" class="container mx-auto">
   <h1 class="text-lg">Please Verify Your Email</h1>
   <form
     class=" <%= locals.error && 'was-validated is-invalid' || 'needs-validation' %>"
@@ -23,8 +23,10 @@
         <% } %>
       </div>
     </div>
-    <button class="btn btn-primary">Verify</button>
+    <button type="submit" class="btn btn-primary ml-3">Verify</button>
+    <button id="resend" type="button" class="btn btn-secondary ml-2">Resend Code</button>
   </form>
+  <div id="resend-info" aria-live="polite"></div>
 </div>
 
 <%- include('../partials/footer') %>
