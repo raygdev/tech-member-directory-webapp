@@ -17,20 +17,15 @@ const postResendVerification = async (req, res) => {
     await verificationToSend.populate("user");
     await verificationToSend.save();
 
-    transporter.sendMail(
-      {
-        from: "evan76@ethereal.mail",
-        to: verificationToSend.user.email,
-        subject: "Your verification code",
-        text: `Your code: ${verificationToSend.code}`,
-      },
-      (err, info) => {
-        if (err) throw err;
-
-        console.log("[MAIL SENT INFO]", info);
-        res.json({ message: "A new verification code was sent. Please check your inbox" });
-      }
-    );
+    await transporter({
+      from: "evan76@ethereal.mail",
+      to: verificationToSend.user.email,
+      subject: "Your verification code",
+      text: `Your code: ${verificationToSend.code}`,
+    });
+    res.json({
+      message: "A new verification code was sent. Please check your inbox",
+    });
   } catch (error) {
     console.log("[RESEND VERIFICATION ERROR]", error);
     res.status(400).json({ message: `An error occurred: ${error.message}` });
