@@ -1,15 +1,15 @@
-const Verify = require("../../models/Verify");
+const { Verification } = require("../../models");
 
 const getVerifyAccount = async (req, res) => {
   res.render("auth/verify");
 };
 
 const postVerifyAccount = async (req, res) => {
-  const { userId } = req.query;
+  const { userid } = req.query;
   const { code } = req.body;
   try {
     // find the verification code by the userId
-    const verification = await Verify.findOne({ user: userId });
+    const verification = await Verification.findOne({ user: userid });
 
     if (!verification) {
       res.render("auth/verify", {
