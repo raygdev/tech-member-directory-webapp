@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+<div class="container mx-auto">
+  <h1 class="text-lg">Please Verify Your Email</h1>
+  <form
+    class=" <%= locals.error && 'was-validated is-invalid' || 'needs-validation' %>"
+    action="/verify"
+    method="post"
+  >
+    <div class="form-group col">
+      <label for="code">Enter 6 Digit Code</label>
+      <input
+        placeholder="Enter Code"
+        value="<%= locals.code && parseInt(code) || '' %>"
+        name="code"
+        id="code"
+        type="number"
+        required
+        class="form-control form-control-lg <%= locals.error && 'is-invalid' %>"
+      />
+      <div class="invalid-feedback">
+        <% if(!!locals.error) { %>
+        <span><%= error %></span>
+        <% } %>
+      </div>
+    </div>
+    <button class="btn btn-primary">Verify</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
+<script src="/js/verify.js"></script>
+</body>
