@@ -11,6 +11,8 @@ if (process.env.NODE_ENV !== "production") {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    connectionTimeout: 10000, // timeout after 10 seconds
+    socketTimeout: 20000, // timeout after 20 seconds
   };
 } else {
   mailOptions = {
@@ -21,6 +23,8 @@ if (process.env.NODE_ENV !== "production") {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    connectionTimeout: 10000, // timeout after 10 seconds
+    socketTimeout: 20000 // timeout after 20 seconds
   };
 }
 
