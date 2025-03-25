@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { Project, User } = require("../models/index.js");
-const ensureAuthenticated = require("../middleware/auth.js");
-const mongoose = require("mongoose");
+const { Project, User } = require('../models/index.js');
+const ensureAuthenticated = require('../middleware/auth.js');
+const mongoose = require('mongoose');
 const multer = require('multer');
 
 // Configure multer for handling file uploads
@@ -118,26 +118,23 @@ router.post("/", ensureAuthenticated, async (req, res) => {
                 _id: user._id,
                 username: user.username,
             },
-            contributors: [
-                {
+            contributors: [{
                     _id: user._id,
                     username: user.username,
-                },
-            ], // Owner is automatically a contributor
+                }], // Owner is automatically a contributor
             createdAt: Date.now(),
             updatedAt: Date.now(),
         });
 
         await project.save();
-        res.status(201).json({
-            message: "Project created successfully",
-            project,
-        });
+        res.status(201).json({ message: "Project created successfully", project });
+
     } catch (error) {
         console.error("Error in /submit route:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 // Update project details
 router.patch("/:id", ensureAuthenticated, async function (req, res) {
@@ -156,15 +153,9 @@ router.patch("/:id", ensureAuthenticated, async function (req, res) {
         }
 
         // Check if user is owner or contributor
-        if (
-            project.owner._id.toString() !== req.user._id.toString() &&
-            !project.contributors.some(
-                (c) => c.toString() === req.user._id.toString()
-            )
-        ) {
-            return res.status(403).json({
-                error: "Forbidden: You are not authorized to update this project",
-            });
+        if (project.owner._id.toString() !== req.user._id.toString() &&
+            !project.contributors.some(c => c.toString() === req.user._id.toString())) {
+            return res.status(403).json({ error: "Forbidden: You are not authorized to update this project" });
         }
 
         // Update project fields
@@ -180,11 +171,13 @@ router.patch("/:id", ensureAuthenticated, async function (req, res) {
             message: "Project updated successfully",
             project: project,
         });
+
     } catch (error) {
         console.error("Error updating project:", error);
         return res.status(500).json({ error: "An unexpected error occurred" });
     }
 });
+
 
 // Delete a project by its project ID.
 router.delete("/:id", ensureAuthenticated, async function (req, res) {
@@ -203,29 +196,20 @@ router.delete("/:id", ensureAuthenticated, async function (req, res) {
         }
 
         // Check if the user is the owner or an admin.
-        if (
-            project.owner._id.toString() !== req.user._id.toString() &&
-            req.user.role !== "admin"
-        ) {
-            return res
-                .status(403)
-                .send(
-                    "Forbidden: You are not authorized to delete this project."
-                );
+        if (project.owner._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+            return res.status(403).send("Forbidden: You are not authorized to delete this project.");
         }
 
         await Project.findByIdAndDelete(projectId);
-        //after deletion user should be redirected to home page
-        if (req.headers["accept"] === "application/json") {
-            return res.json({ message: "Project deleted successfully." });
-        } else {
-            return res.redirect("/projects");
-        }
+        
+        return res.json({ message: "Project deleted successfully." });
+
     } catch (error) {
         console.error("Error deleting project:", error);
         res.status(500).send("Internal Server Error.");
     }
 });
+
 
 /*****
  * Routes for serving project pages
@@ -252,6 +236,7 @@ router.get(["/tables", "/cards"], function (req, res) {
         });
 });
 
+
 // This route serves the new project form page.
 router.get("/submit", function (req, res) {
     if (req.isAuthenticated()) {
@@ -260,6 +245,7 @@ router.get("/submit", function (req, res) {
         res.redirect("/login");
     }
 });
+
 
 // This route serves the page for editing a given project
 // Updated edit route to handle projects
@@ -273,17 +259,9 @@ router.get("/edit/:id", ensureAuthenticated, function (req, res) {
                 return res.status(404).send("Project not found");
             }
             // Check if the user is the owner or a contributor
-            if (
-                project.owner._id.toString() !== req.user._id.toString() &&
-                !project.contributors.some(
-                    (c) => c._id.toString() === req.user._id.toString()
-                )
-            ) {
-                return res
-                    .status(403)
-                    .send(
-                        "Forbidden: You are not authorized to edit this project."
-                    );
+            if (project.owner._id.toString() !== req.user._id.toString() &&
+                !project.contributors.some(c => c._id.toString() === req.user._id.toString())) {
+                return res.status(403).send("Forbidden: You are not authorized to edit this project.");
             }
             res.render("edit", { project, user: req.user });
         })
@@ -295,4 +273,3 @@ router.get("/edit/:id", ensureAuthenticated, function (req, res) {
 
 
 module.exports = router;
-

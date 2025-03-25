@@ -57,9 +57,11 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use("/projects", projectsRouter);
 
+
 app.get("/", function (req, res) {
     res.render("login");
 });
+
 
 app.get("/login", function (req, res) {
     if (req.isAuthenticated()) {
@@ -68,12 +70,14 @@ app.get("/login", function (req, res) {
     res.render("login");
 });
 
+
 app.get("/register", function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect("/projects/tables", { user: req.user });
     }
     res.render("register");
 });
+
 
 app.get("/logout", function (req, res) {
     req.session.destroy((err) => {
@@ -87,6 +91,7 @@ app.get("/logout", function (req, res) {
         }
     });
 });
+
 
 app.post("/register", function (req, res) {
     User.register(
@@ -104,6 +109,7 @@ app.post("/register", function (req, res) {
         }
     );
 });
+
 
 app.post("/login", function (req, res) {
     // TODO Users can send a capitalized username if they target this route directly
