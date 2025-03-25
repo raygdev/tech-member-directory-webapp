@@ -200,9 +200,13 @@ router.delete("/:id", ensureAuthenticated, async function (req, res) {
             return res.status(403).send("Forbidden: You are not authorized to delete this project.");
         }
 
-        await Project.findByIdAndDelete(projectId);
-        
-        return res.json({ message: "Project deleted successfully." });
+        await Project.findByIdAndDelete(projectId); 
+        //after deletion user should be redirected to home page
+        if (req.headers["accept"] === "application/json") {
+            return res.json({ message: "Project deleted successfully." });
+        } else {
+            return res.redirect("/projects");
+        }
 
     } catch (error) {
         console.error("Error deleting project:", error);
