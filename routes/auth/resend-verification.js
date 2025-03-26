@@ -3,7 +3,7 @@ const transporter = require("../../config/nodemailer.config");
 
 const postResendVerification = async (req, res) => {
   const { userid } = req.query;
-  const code = Math.floor(100000 + Math.random() * 999999);
+  const code = Math.floor(100000 + Math.random() * 900000);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
   try {
     await Verification.deleteMany({ user: userid });
