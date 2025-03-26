@@ -8,7 +8,7 @@ const postRegister = async function (req, res) {
     const user = await User.register({ username, email }, password);
     await user.save();
 
-    const code = Math.floor(100000 + Math.random() * 999999);
+    const code = Math.floor(100000 + Math.random() * 900000);
 
     const verification = new Verification({
       code,
@@ -19,10 +19,9 @@ const postRegister = async function (req, res) {
     await verification.save();
 
     await transporter({
-      // TODO: Create env for email 'from' address
-      from: "evan76@ethereal.mail",
+      from: process.env.EMAIL,
       to: user.email,
-      subject: "Your verification code",
+      subject: "Your Casual Coding verification code",
       text: `Verification Code: ${verification.code}`,
     });
     res.redirect(`/verify?userid=${user._id.toString()}`);
