@@ -4,7 +4,7 @@ const { promisify } = require("util");
 const DEV = process.env.NODE_ENV !== "production";
 
 const mailOptions = {
-  host: DEV ? "smtp.ethereal.email" : "smtp.google.com",
+  host: DEV ? "smtp.ethereal.email" : "smtp.gmail.com",
   port: DEV ? 587 : 465,
   secure: DEV ? false : true,
   auth: {
