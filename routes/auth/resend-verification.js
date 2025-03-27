@@ -22,7 +22,7 @@ const postResendVerification = async (req, res) => {
     await verificationToSend.save();
 
     await transporter({
-      from: process.env.EMAIL,
+      from: `"Casual Coding" <${process.env.EMAIL}>`,
       to: verificationToSend.user.email,
       subject: "Your Casual Coding verification code",
       text: `Your code: ${verificationToSend.code}`,
