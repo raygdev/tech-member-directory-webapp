@@ -52,7 +52,7 @@ resendButton.addEventListener('click', async function(e){
     const { message } = await verification.json()
 
     if(verification.status !== 200) {
-      throw await verification.json()
+      throw new Error(message)
     }
 
     resendInfo.textContent = message
@@ -65,7 +65,7 @@ resendButton.addEventListener('click', async function(e){
     const { message } = error
     resendInfo.textContent = message
   } finally {
-    this.removeAttribute('disabled', false)
+    this.removeAttribute('disabled')
   }
 
 })
