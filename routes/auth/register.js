@@ -19,7 +19,7 @@ const postRegister = async function (req, res) {
     await verification.save();
 
     await transporter({
-      from: `"Casual Coding" <${process.env.EMAIL}>`,
+      from: `"Casual Coding" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Your Casual Coding verification code",
       text: `Verification Code: ${verification.code}`,
