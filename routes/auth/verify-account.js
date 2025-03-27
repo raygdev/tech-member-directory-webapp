@@ -9,7 +9,8 @@ const postVerifyAccount = async (req, res) => {
   const { userid } = req.query;
   const { code } = req.body;
   try {
-    if(!mongoose.Types.ObjectId.isValid(userid)) throw new Error('invalid userid query')
+    if (!mongoose.Types.ObjectId.isValid(userid))
+      throw new Error('invalid userid query');
     // find the verification code by the userId
     const verification = await Verification.findOne({ user: userid });
 
