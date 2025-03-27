@@ -1,4 +1,5 @@
 const { Verification } = require("../../models");
+const mongoose = require("mongoose");
 const transporter = require("../../config/nodemailer.config");
 
 const postResendVerification = async (req, res) => {
@@ -6,6 +7,9 @@ const postResendVerification = async (req, res) => {
   const code = Math.floor(100000 + Math.random() * 900000);
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
   try {
+    if (!mongoose.Types.ObjectId.isValid(userid))
+      throw new Error("invalid userid query");
+
     await Verification.deleteMany({ user: userid });
 
     const verificationToSend = new Verification({

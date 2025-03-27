@@ -1,4 +1,5 @@
 const { Verification } = require("../../models");
+const mongoose = require('mongoose')
 
 const getVerifyAccount = async (req, res) => {
   res.render("auth/verify");
@@ -8,6 +9,7 @@ const postVerifyAccount = async (req, res) => {
   const { userid } = req.query;
   const { code } = req.body;
   try {
+    if(!mongoose.Types.ObjectId.isValid(userid)) throw new Error('invalid userid query')
     // find the verification code by the userId
     const verification = await Verification.findOne({ user: userid });
 
@@ -36,7 +38,7 @@ const postVerifyAccount = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.render("auth/verify", {
-      error: "Something went wrong",
+      error: `Something went wrong: ${error.message}`,
     });
   }
 };
